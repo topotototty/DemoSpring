@@ -1,0 +1,54 @@
+.navbar {
+    background-color: #f5f5f5;
+}
+
+.navbar-brand {
+    font-size: 1.8rem;
+    color: #111;
+    font-weight: bold;
+    font-family: 'Roboto', sans-serif;
+}
+
+.navbar-nav .nav-link {
+    color: #555;
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    font-family: 'Roboto', sans-serif;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.navbar-toggler {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav .nav-link.active {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+}
+
+.calculator-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+button {
+    width: 100%;
+}

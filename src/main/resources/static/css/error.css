@@ -1,0 +1,22 @@
+.error-container {
+    margin-top: 50px;
+    text-align: center;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px;
+}
+
+h1 {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.error-image {
+    width: 150px;
+}
+
+.custom-rounded {
+    border-radius: 30px;
+    padding: 5px 20px;
+}
