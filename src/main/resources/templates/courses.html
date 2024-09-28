@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список курсов</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .action-col {
+            width: 100px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Список курсов</h1>
+
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-8">
+            <form class="d-flex" action="/home/courses" method="get">
+                <!-- Поле для поиска по имени -->
+                <input type="text" name="name" class="form-control mr-2" placeholder="Поиск по названию" style="width: 60%;">
+
+                <select class="form-control mr-2" name="category">
+                    <option value="">Все категории</option>
+                    <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}"></option>
+                </select>
+
+                <select class="form-control mr-2" name="difficulty">
+                    <option value="">Все уровни сложности</option>
+                    <option th:each="diff : ${difficulties}" th:value="${diff}" th:text="${diff.displayName}"></option>
+                </select>
+
+                <button type="submit" class="btn btn-primary mr-2" style="width: 20%;">Фильтровать</button>
+                <a href="/home/courses" class="btn btn-secondary" style="width: 20%;">Сброс</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="mb-3 text-right">
+        <button type="button" class="btn btn-dark btn-lg" data-toggle="modal" data-target="#createCourseModal">
+            <i class="fas fa-book-plus"></i> Добавить курс
+        </button>
+    </div>
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col"><a href="?sort=name">Название</a></th>
+            <th scope="col">Категория</th>
+            <th scope="col">Сложность</th>
+            <th scope="col" class="action-col">Редактировать</th>
+            <th scope="col" class="action-col">Удалить</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courses}">
+            <th scope="row" th:text="${course.id}"></th>
+            <td th:text="${course.name}"></td>
+            <td th:text="${course.category.displayName}"></td>
+            <td th:text="${course.difficulty.displayName}"></td>
+
+            <td class="action-col">
+                <button class="btn btn-sm btn-info" data-toggle="modal"
+                        th:data-target="'#editCourseModal' + ${course.id}" title="Редактировать">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </td>
+            <td class="action-col">
+                <button class="btn btn-sm btn-danger" data-toggle="modal"
+                        th:data-target="'#deleteCourseModal' + ${course.id}" title="Удалить">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Модальное окно добавления курса -->
+<div class="modal fade" id="createCourseModal" tabindex="-1" role="dialog" aria-labelledby="createCourseModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCourseModalLabel">Добавить курс</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/home/courses/create" method="post">
+                    <div class="form-group">
+                        <label for="name">Название</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               placeholder="Введите название курса" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Категория</label>
+                        <select class="form-control" id="category" name="category" required>
+                            <option value="PROGRAMMING">Программирование</option>
+                            <option value="DESIGN">Дизайн</option>
+                            <option value="MARKETING">Маркетинг</option>
+                            <option value="MANAGEMENT">Менеджмент</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty">Сложность</label>
+                        <select class="form-control" id="difficulty" name="difficulty" required>
+                            <option value="EASY">Легкая</option>
+                            <option value="MEDIUM">Средняя</option>
+                            <option value="HARD">Тяжелая</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Создать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальные окна для редактирования и удаления курсов -->
+<tr th:each="course : ${courses}">
+    <!-- Модальное окно изменения курса -->
+    <div class="modal fade" th:id="'editCourseModal' + ${course.id}" tabindex="-1" role="dialog" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:id="'editCourseModalLabel' + ${course.id}">Редактировать курс</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/home/courses/update" method="post">
+                        <input type="hidden" name="id" th:value="${course.id}"/>
+
+                        <div class="form-group">
+                            <label for="edit-name">Название</label>
+                            <input type="text" class="form-control" th:id="'edit-name' + ${course.id}" name="name" th:value="${course.name}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-category">Категория</label>
+                            <select class="form-control" th:id="'edit-category' + ${course.id}" name="category" required>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}"
+                                        th:selected="${cat == course.category}">Категория</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-difficulty">Сложность</label>
+                            <select class="form-control" th:id="'edit-difficulty' + ${course.id}" name="difficulty" required>
+                                <option th:each="diff : ${difficulties}" th:value="${diff}" th:text="${diff.displayName}"
+                                        th:selected="${diff == course.difficulty}">Сложность</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Модальное окно удаления курса -->
+    <div class="modal fade" th:id="'deleteCourseModal' + ${course.id}" tabindex="-1" role="dialog"
+         aria-labelledby="deleteCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:id="'deleteCourseModalLabel' + ${course.id}">Удалить курс</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить курс <strong th:text="${course.name}"></strong>? Это действие
+                        нельзя отменить.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <form action="/home/courses/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${course.id}">
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</tr>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

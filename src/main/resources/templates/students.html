@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список студентов</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .action-col {
+            width: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Список студентов</h1>
+
+    <!-- Форма для поиска по имени -->
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-8">
+            <form class="d-flex" action="/home/students" method="get">
+                <input type="text" name="name" class="form-control mr-2" placeholder="Поиск по имени" style="width: 60%;">
+                <button type="submit" class="btn btn-primary mr-2" style="width: 20%;">Поиск</button>
+                <a href="/home/students" class="btn btn-secondary" style="width: 20%;">Сброс</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Отдельная форма для множественного удаления -->
+    <form action="/home/students/delete-multiple" method="post" id="multipleDeleteForm">
+        <div class="mb-3 text-right">
+            <button type="button" class="btn btn-dark btn-lg" data-toggle="modal" data-target="#createStudentModal">
+                <i class="fas fa-user-plus"></i> Добавить студента
+            </button>
+            <button type="submit" class="btn btn-danger btn-lg">
+                <i class="fas fa-trash-alt"></i> Удалить выбранные
+            </button>
+        </div>
+
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col"><input type="checkbox" id="select-all"></th> <!-- Чекбокс для выбора всех студентов -->
+                <th scope="col">#</th>
+                <th scope="col"><a href="?sort=name">Имя</a></th> <!-- Сортировка по имени -->
+                <th scope="col">Email</th>
+                <th scope="col">Пароль</th>
+                <th scope="col" class="action-col">Редактировать</th>
+                <th scope="col" class="action-col">Удалить</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="student : ${students}">
+                <td><input type="checkbox" name="ids" th:value="${student.id}" class="student-checkbox"></td> <!-- Чекбоксы для множественного удаления -->
+                <th scope="row" th:text="${student.id}"></th>
+                <td th:text="${student.name}"></td>
+                <td th:text="${student.email}"></td>
+                <td th:text="${student.password}"></td>
+
+                <!-- Кнопки изменения и удаления не находятся в форме множественного удаления -->
+                <td class="action-col">
+                    <button class="btn btn-sm btn-info" data-toggle="modal"
+                            th:data-target="'#editStudentModal' + ${student.id}" title="Редактировать">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </td>
+                <td class="action-col">
+                    <button class="btn btn-sm btn-danger" data-toggle="modal"
+                            th:data-target="'#deleteStudentModal' + ${student.id}" title="Удалить">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<!-- Модальное окно добавления студента -->
+<div class="modal fade" id="createStudentModal" tabindex="-1" role="dialog" aria-labelledby="createStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createStudentModalLabel">Добавить студента</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/home/students/create" method="post">
+                    <div class="form-group">
+                        <label for="name">Имя</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Введите имя" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Введите email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Введите пароль" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Создать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальные окна изменения и удаления студентов -->
+<tr th:each="student : ${students}">
+    <!-- Модальное окно изменения студента -->
+    <div class="modal fade" th:id="'editStudentModal' + ${student.id}" tabindex="-1" role="dialog" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:id="'editStudentModalLabel' + ${student.id}">Редактировать студента</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/home/students/update" method="post">
+                        <input type="hidden" name="id" th:value="${student.id}"/>
+                        <div class="form-group">
+                            <label for="edit-name">Имя</label>
+                            <input type="text" class="form-control" th:id="'edit-name' + ${student.id}" name="name" th:value="${student.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-email">Email</label>
+                            <input type="email" class="form-control" th:id="'edit-email' + ${student.id}" name="email" th:value="${student.email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-password">Пароль</label>
+                            <input type="password" class="form-control" th:id="'edit-password' + ${student.id}" name="password" placeholder="Введите новый пароль (опционально)">
+                        </div>
+                        <button type="submit" class="btn btn-success">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения удаления студента -->
+    <div class="modal fade" th:id="'deleteStudentModal' + ${student.id}" tabindex="-1" role="dialog" aria-labelledby="deleteStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:id="'deleteStudentModalLabel' + ${student.id}">Удалить студента</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить студента <strong th:text="${student.name}"></strong>? Это действие нельзя отменить.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <form action="/home/students/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${student.id}">
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</tr>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Скрипт для выбора всех чекбоксов
+    document.getElementById('select-all').onclick = function() {
+        var checkboxes = document.getElementsByClassName('student-checkbox');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    };
+</script>
+
+</body>
+</html>
