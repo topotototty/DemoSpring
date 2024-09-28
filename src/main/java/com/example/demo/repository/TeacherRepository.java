@@ -49,4 +49,20 @@ public class TeacherRepository {
     public boolean deleteTeacher(UUID id) {
         return TEACHERS.removeIf(teacherModel -> teacherModel.getId().equals(id));
     }
+
+    public List<TeacherModel> findPaginatedTeachers(int page, int size) {
+        int start = page * size;
+        int end = Math.min(start + size, TEACHERS.size());
+
+        if (start > TEACHERS.size()) {
+            return new ArrayList<>();
+        }
+
+        return TEACHERS.subList(start, end);
+    }
+
+    public int getTotalTeachers() {
+        return TEACHERS.size();
+    }
+
 }

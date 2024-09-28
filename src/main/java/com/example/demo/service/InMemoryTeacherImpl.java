@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.model.TeacherModel;
 import com.example.demo.repository.TeacherRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +22,6 @@ public class InMemoryTeacherImpl implements TeacherService {
     public List<TeacherModel> findAllTeachers() {
         return teacherRepository.findAllTeachers();
     }
-
     @Override
     public TeacherModel createTeacher(TeacherModel teacherModel) {
         return teacherRepository.createTeacher(teacherModel);
@@ -40,4 +41,15 @@ public class InMemoryTeacherImpl implements TeacherService {
     public void deleteTeacher(UUID id) {
         teacherRepository.deleteTeacher(id);
     }
+
+    @Override
+    public List<TeacherModel> findPaginatedTeachers(int page, int size) {
+        return teacherRepository.findPaginatedTeachers(page, size); // Получаем учителей для указанной страницы
+    }
+
+    @Override
+    public int getTotalTeachers() {
+        return teacherRepository.getTotalTeachers(); // Общее количество учителей
+    }
+
 }

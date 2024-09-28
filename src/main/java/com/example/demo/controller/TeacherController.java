@@ -3,10 +3,14 @@ package com.example.demo.controller;
 import com.example.demo.model.TeacherModel;
 import com.example.demo.model.CourseCategory;
 import com.example.demo.service.TeacherService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -20,8 +24,19 @@ public class TeacherController {
     }
 
     @GetMapping
-    public String getAllTeachers(Model model) {
-        model.addAttribute("teachers", teacherService.findAllTeachers());
+    public String getAllTeachers(
+            Model model,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size) {
+
+        List<TeacherModel> teacherPage = teacherService.findPaginatedTeachers(page, size);
+        int totalTeachers = teacherService.getTotalTeachers();
+        int totalPages = (int) Math.ceil((double) totalTeachers / size);
+
+        model.addAttribute("teachers", teacherPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
         return "teachers";
     }
 
